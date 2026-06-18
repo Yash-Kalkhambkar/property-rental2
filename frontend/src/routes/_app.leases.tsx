@@ -48,13 +48,16 @@ const STATUS_FILTERS: (LeaseStatus | "ALL")[] = ["ALL", "ACTIVE", "EXPIRED", "TE
 function NewLeaseDialog() {
   const [open, setOpen] = useState(false);
   const [propertyId, setPropertyId] = useState("");
-  const { data: properties } = useProperties();
+  const { data: properties, isError: propertiesError } = useProperties();
   const { data: units } = usePropertyUnits(propertyId, { status: "VACANT" });
-  const { data: tenants } = useTenants();
+  const { data: tenants, isError: tenantsError } = useTenants();
   const create = useCreateLease();
 
+  const propertyItems = properties?.items ?? [];
+  const tenantItems = tenants?.items ?? [];
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setPropertyId(""); }}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-1.5 h-4 w-4" /> New lease
@@ -64,26 +67,40 @@ function NewLeaseDialog() {
         <DialogHeader>
           <DialogTitle>Create lease</DialogTitle>
         </DialogHeader>
+
+        {(propertiesError || tenantsError) && (
+          <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            Could not load data. Check your connection and try again.
+          </p>
+        )}
+
         <div className="space-y-2">
           <Label>Property</Label>
-          <Select value={propertyId} onValueChange={setPropertyId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a property to load vacant units" />
-            </SelectTrigger>
-            <SelectContent>
-              {(properties?.items ?? []).map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {propertyItems.length === 0 && !propertiesError ? (
+            <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
+              No properties found. Add a property first.
+            </p>
+          ) : (
+            <Select value={propertyId} onValueChange={setPropertyId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a property" />
+              </SelectTrigger>
+              <SelectContent>
+                {propertyItems.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name} — {p.city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
+
         <LeaseForm
           units={units ?? []}
-          tenants={tenants?.items ?? []}
+          tenants={tenantItems}
           isSubmitting={create.isPending}
-          onSubmit={(v) => create.mutate(v, { onSuccess: () => setOpen(false) })}
+          onSubmit={(v) => create.mutate(v, { onSuccess: () => { setOpen(false); setPropertyId(""); } })}
         />
       </DialogContent>
     </Dialog>

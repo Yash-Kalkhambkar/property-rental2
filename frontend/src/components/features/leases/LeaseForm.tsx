@@ -64,34 +64,50 @@ export function LeaseForm({
     >
       <div className="space-y-2">
         <Label>Unit</Label>
-        <Select value={watch("unit_id")} onValueChange={(v) => setValue("unit_id", v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a vacant unit" />
-          </SelectTrigger>
-          <SelectContent>
-            {units.map((u) => (
-              <SelectItem key={u.id} value={u.id}>
-                {u.unit_number} · {u.unit_type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {units.length === 0 ? (
+          <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
+            Select a property above to see its vacant units.
+          </p>
+        ) : (
+          <Select value={watch("unit_id")} onValueChange={(v) => {
+            setValue("unit_id", v, { shouldValidate: true });
+            const unit = units.find((u) => u.id === v);
+            if (unit) setValue("monthly_rent", unit.monthly_rent);
+          }}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a vacant unit" />
+            </SelectTrigger>
+            <SelectContent>
+              {units.map((u) => (
+                <SelectItem key={u.id} value={u.id}>
+                  {u.unit_number} · {u.unit_type} · ₹{u.monthly_rent.toLocaleString("en-IN")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {errors.unit_id && <p className="text-xs text-destructive">{errors.unit_id.message}</p>}
       </div>
       <div className="space-y-2">
         <Label>Tenant</Label>
-        <Select value={watch("tenant_id")} onValueChange={(v) => setValue("tenant_id", v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a tenant" />
-          </SelectTrigger>
-          <SelectContent>
-            {tenants.map((t) => (
-              <SelectItem key={t.id} value={t.id}>
-                {t.full_name} · {t.phone}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {tenants.length === 0 ? (
+          <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
+            No tenants found. Add a tenant first.
+          </p>
+        ) : (
+          <Select value={watch("tenant_id")} onValueChange={(v) => setValue("tenant_id", v, { shouldValidate: true })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a tenant" />
+            </SelectTrigger>
+            <SelectContent>
+              {tenants.map((t) => (
+                <SelectItem key={t.id} value={t.id}>
+                  {t.full_name} · {t.phone}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {errors.tenant_id && (
           <p className="text-xs text-destructive">{errors.tenant_id.message}</p>
         )}
