@@ -115,8 +115,34 @@ def update_unit(
 
 
 def delete_unit(db: Session, owner: Owner, unit_id: str) -> None:
-    """Delete a unit. Fails if it has an active lease."""
+    """Delete a unit. Fails if it has any lease (active or historical)."""
     unit = _get_unit_with_owner_check(db, owner, unit_id)
+
+    active_lease = (
+        db.query(Lease)
+        .filter(Lease.unit_id == unit.id, Lease.status == "ACTIVE")
+        .first()
+    )
+    if active_lease:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete — unit has an active lease",
+        )
+
+    # Also check for historical leases (RESTRICT FK prevents deletion)
+    any_lease = (
+        db.query(Lease)
+        .filter(Lease.unit_id == unit.id)
+        .first()
+    )
+    if any_lease:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete — unit has lease history. Archive or reassign leases first.",
+        )
+
+    db.delete(unit)
+    db.commit()
 
     active_lease = (
         db.query(Lease)

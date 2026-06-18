@@ -147,7 +147,14 @@ def delete_property(
         )
 
     db.delete(prop)
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete — one or more units have lease history",
+        )
 
 
 def _property_to_response(db: Session, prop: Property) -> PropertyResponse:
