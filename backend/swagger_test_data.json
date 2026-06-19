@@ -1,0 +1,589 @@
+{
+  "metadata": {
+    "description": "Swagger/API Testing Data - Use these examples in Swagger UI 'Try it out'",
+    "base_url": "https://property-rental2.onrender.com/api/v1",
+    "local_url": "http://localhost:8000/api/v1",
+    "swagger_docs": "/docs"
+  },
+  "test_credentials": {
+    "user1": {
+      "email": "apitest20260618@example.com",
+      "password": "TestPass@99",
+      "role": "owner",
+      "description": "Main test account for API testing"
+    },
+    "admin": {
+      "email": "admin@rentease.com",
+      "password": "Admin@1234",
+      "role": "admin",
+      "description": "Admin test account"
+    }
+  },
+  "auth": {
+    "register": {
+      "endpoint": "POST /auth/register",
+      "description": "Register a new user account",
+      "request_body": {
+        "email": "newuser@example.com",
+        "password": "SecurePass@123",
+        "full_name": "John Doe",
+        "phone": "9876543210"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "message": "User registered successfully",
+        "data": {
+          "id": "uuid-string",
+          "email": "newuser@example.com",
+          "full_name": "John Doe",
+          "phone": "9876543210"
+        }
+      },
+      "error_responses": {
+        "409": "Email already exists",
+        "422": "Invalid password strength or missing fields"
+      }
+    },
+    "login": {
+      "endpoint": "POST /auth/login",
+      "description": "Login and get access token (stores refresh token as httpOnly cookie)",
+      "request_body": {
+        "email": "apitest20260618@example.com",
+        "password": "TestPass@99"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "message": "Login successful",
+        "data": {
+          "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "token_type": "bearer",
+          "user": {
+            "id": "uuid-string",
+            "email": "apitest20260618@example.com",
+            "full_name": "API Tester",
+            "phone": "9111111111"
+          }
+        }
+      },
+      "cookies": "refresh_token=xxx (httpOnly, secure)"
+    },
+    "me": {
+      "endpoint": "GET /auth/me",
+      "description": "Get current authenticated user profile",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "uuid-string",
+          "email": "apitest20260618@example.com",
+          "full_name": "API Tester",
+          "phone": "9111111111",
+          "created_at": "2026-06-18T10:30:00Z"
+        }
+      }
+    },
+    "refresh": {
+      "endpoint": "POST /auth/refresh",
+      "description": "Refresh access token using httpOnly refresh cookie",
+      "cookies_required": "refresh_token",
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "access_token": "new-jwt-token",
+          "token_type": "bearer"
+        }
+      }
+    },
+    "logout": {
+      "endpoint": "POST /auth/logout",
+      "description": "Clear refresh token and logout",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "message": "Logged out successfully"
+      }
+    }
+  },
+  "properties": {
+    "create": {
+      "endpoint": "POST /properties/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "name": "Sunset Towers",
+        "address_line": "123 Main Street",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "pincode": "411001",
+        "property_type": "RESIDENTIAL",
+        "total_units": 5,
+        "description": "Modern residential complex"
+      },
+      "enum_values": {
+        "property_type": ["RESIDENTIAL", "COMMERCIAL", "MIXED"]
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "uuid-string",
+          "name": "Sunset Towers",
+          "city": "Pune",
+          "total_units": 5,
+          "created_at": "2026-06-18T10:30:00Z"
+        }
+      }
+    },
+    "list": {
+      "endpoint": "GET /properties/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "query_params": {
+        "city": "Pune",
+        "property_type": "RESIDENTIAL",
+        "page": 1,
+        "limit": 10
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "items": [],
+          "total": 5,
+          "page": 1,
+          "limit": 10
+        }
+      }
+    },
+    "get_by_id": {
+      "endpoint": "GET /properties/{id}",
+      "path_params": {
+        "id": "property-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "uuid",
+          "name": "Sunset Towers",
+          "address_line": "123 Main Street",
+          "city": "Pune",
+          "property_type": "RESIDENTIAL"
+        }
+      }
+    },
+    "update": {
+      "endpoint": "PATCH /properties/{id}",
+      "path_params": {
+        "id": "property-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "city": "Mumbai",
+        "description": "Updated description"
+      }
+    },
+    "delete": {
+      "endpoint": "DELETE /properties/{id}",
+      "path_params": {
+        "id": "property-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "note": "Will fail (409) if property has units with lease history (RESTRICT FK)"
+    }
+  },
+  "units": {
+    "create": {
+      "endpoint": "POST /properties/{property_id}/units",
+      "path_params": {
+        "property_id": "property-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "unit_number": "101",
+        "floor": 1,
+        "area_sqft": 750,
+        "unit_type": "2BHK",
+        "monthly_rent": 15000,
+        "deposit_amount": 30000,
+        "amenities": ["WiFi", "Parking", "Gym"],
+        "description": "Spacious 2BHK unit"
+      },
+      "enum_values": {
+        "unit_type": ["1BHK", "2BHK", "3BHK", "STUDIO", "PENTHOUSE"]
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "unit-uuid",
+          "unit_number": "101",
+          "status": "VACANT",
+          "monthly_rent": 15000
+        }
+      }
+    },
+    "list": {
+      "endpoint": "GET /properties/{property_id}/units",
+      "path_params": {
+        "property_id": "property-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "query_params": {
+        "status": "VACANT"
+      },
+      "enum_status": ["VACANT", "OCCUPIED", "MAINTENANCE"]
+    },
+    "get_by_id": {
+      "endpoint": "GET /units/{id}",
+      "path_params": {
+        "id": "unit-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      }
+    },
+    "update": {
+      "endpoint": "PATCH /units/{id}",
+      "path_params": {
+        "id": "unit-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "monthly_rent": 16000,
+        "deposit_amount": 32000,
+        "amenities": ["WiFi", "Parking", "Gym", "Pool"]
+      }
+    },
+    "delete": {
+      "endpoint": "DELETE /units/{id}",
+      "path_params": {
+        "id": "unit-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "note": "Will fail (409) if unit has active leases (RESTRICT FK)"
+    }
+  },
+  "tenants": {
+    "create": {
+      "endpoint": "POST /tenants/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "full_name": "Ravi Kumar",
+        "phone": "9876543210",
+        "email": "ravi.kumar@example.com",
+        "id_type": "AADHAAR",
+        "id_number": "1234-5678-9012",
+        "address": "Apt 45, Sector 5, Pune"
+      },
+      "enum_values": {
+        "id_type": ["AADHAAR", "PAN", "PASSPORT", "DRIVING_LICENSE"]
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "tenant-uuid",
+          "full_name": "Ravi Kumar",
+          "email": "ravi.kumar@example.com",
+          "phone": "9876543210"
+        }
+      }
+    },
+    "list": {
+      "endpoint": "GET /tenants/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "query_params": {
+        "search": "Ravi",
+        "page": 1,
+        "limit": 10
+      }
+    },
+    "get_by_id": {
+      "endpoint": "GET /tenants/{id}",
+      "path_params": {
+        "id": "tenant-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      }
+    },
+    "update": {
+      "endpoint": "PATCH /tenants/{id}",
+      "path_params": {
+        "id": "tenant-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "phone": "9999999999",
+        "email": "newemail@example.com"
+      }
+    },
+    "delete": {
+      "endpoint": "DELETE /tenants/{id}",
+      "path_params": {
+        "id": "tenant-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "note": "Will fail (409) if tenant has lease history (RESTRICT FK)"
+    }
+  },
+  "leases": {
+    "create": {
+      "endpoint": "POST /leases/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "unit_id": "unit-uuid",
+        "tenant_id": "tenant-uuid",
+        "start_date": "2026-06-18",
+        "end_date": "2027-06-18",
+        "monthly_rent": 15000,
+        "deposit_paid": 30000,
+        "rent_due_day": 5,
+        "notes": "Standard 1-year lease agreement"
+      },
+      "date_format": "YYYY-MM-DD (ISO 8601)",
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "lease-uuid",
+          "unit_id": "unit-uuid",
+          "tenant_id": "tenant-uuid",
+          "status": "ACTIVE",
+          "monthly_rent": 15000
+        }
+      },
+      "note": "Unit status auto-changes to OCCUPIED"
+    },
+    "list": {
+      "endpoint": "GET /leases/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "query_params": {
+        "status": "ACTIVE",
+        "expiring_in_days": 30,
+        "page": 1,
+        "limit": 10
+      },
+      "enum_status": ["ACTIVE", "TERMINATED", "PENDING"]
+    },
+    "get_by_id": {
+      "endpoint": "GET /leases/{id}",
+      "path_params": {
+        "id": "lease-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "response_includes": [
+        "unit details",
+        "tenant details",
+        "payments_summary (total_due, total_paid, overdue_amount)"
+      ]
+    },
+    "update": {
+      "endpoint": "PATCH /leases/{id}",
+      "path_params": {
+        "id": "lease-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "notes": "Updated lease notes",
+        "monthly_rent": 16000
+      }
+    },
+    "terminate": {
+      "endpoint": "PATCH /leases/{id}/terminate",
+      "path_params": {
+        "id": "lease-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "reason": "Tenant vacating",
+        "termination_date": "2026-06-30"
+      },
+      "note": "Unit status auto-changes to VACANT, lease status → TERMINATED"
+    }
+  },
+  "payments": {
+    "create": {
+      "endpoint": "POST /payments/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "lease_id": "lease-uuid",
+        "amount_due": 15000,
+        "amount_paid": 15000,
+        "due_date": "2026-06-05",
+        "paid_date": "2026-06-05",
+        "payment_method": "UPI",
+        "reference_number": "UPI12345678"
+      },
+      "enum_values": {
+        "payment_method": ["CASH", "CHEQUE", "BANK_TRANSFER", "UPI", "CREDIT_CARD"]
+      },
+      "auto_status_calculation": {
+        "PAID": "amount_paid >= amount_due",
+        "PARTIAL": "amount_paid > 0 AND amount_paid < amount_due",
+        "PENDING": "amount_paid == 0"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "data": {
+          "id": "payment-uuid",
+          "lease_id": "lease-uuid",
+          "status": "PAID",
+          "amount_paid": 15000
+        }
+      }
+    },
+    "list": {
+      "endpoint": "GET /payments/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "query_params": {
+        "status": "PAID",
+        "lease_id": "lease-uuid",
+        "month": "2026-06",
+        "page": 1,
+        "limit": 10
+      },
+      "month_format": "YYYY-MM",
+      "enum_status": ["PAID", "PARTIAL", "PENDING", "OVERDUE"]
+    },
+    "get_by_id": {
+      "endpoint": "GET /payments/{id}",
+      "path_params": {
+        "id": "payment-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      }
+    },
+    "update": {
+      "endpoint": "PATCH /payments/{id}",
+      "path_params": {
+        "id": "payment-uuid"
+      },
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "request_body": {
+        "amount_paid": 15000,
+        "paid_date": "2026-06-05",
+        "payment_method": "BANK_TRANSFER",
+        "reference_number": "TRF123456789"
+      },
+      "note": "Status is recalculated automatically"
+    }
+  },
+  "dashboard": {
+    "overview": {
+      "endpoint": "GET /dashboard/",
+      "headers": {
+        "Authorization": "Bearer <access_token>"
+      },
+      "response_structure": {
+        "summary": {
+          "total_properties": "number",
+          "total_units": "number",
+          "occupied_units": "number",
+          "vacant_units": "number",
+          "occupancy_rate": "percentage"
+        },
+        "financials": {
+          "current_month_expected": "amount in rupees",
+          "current_month_collected": "amount in rupees",
+          "overdue_count": "number of overdue payments",
+          "overdue_amount": "total overdue amount"
+        },
+        "alerts": {
+          "leases_expiring_soon": "array of leases expiring in next 30 days",
+          "overdue_payments": "array of overdue payment records"
+        }
+      }
+    }
+  },
+  "internal": {
+    "daily_job": {
+      "endpoint": "POST /internal/daily-job",
+      "description": "Cron job to mark overdue payments (internal use only)",
+      "headers": {
+        "X-Internal-Secret": "your-internal-job-secret"
+      },
+      "expected_response_200": {
+        "status": "success",
+        "result": {
+          "marked_overdue": "number of payments marked overdue",
+          "timestamp": "2026-06-18T10:30:00Z"
+        }
+      },
+      "error_responses": {
+        "403": "Invalid or missing X-Internal-Secret header"
+      }
+    }
+  },
+  "jwt_token_structure": {
+    "description": "JWT tokens returned by /auth/login",
+    "format": "Header.Payload.Signature",
+    "example_payload": {
+      "sub": "user-id-uuid",
+      "email": "user@example.com",
+      "exp": 1687000000,
+      "iat": 1686996400,
+      "type": "access"
+    },
+    "usage": "Include in Authorization header: Bearer <access_token>"
+  },
+  "status_codes": {
+    "200": "OK - Request successful",
+    "201": "Created - Resource created",
+    "400": "Bad Request - Invalid input",
+    "401": "Unauthorized - Missing/invalid token",
+    "403": "Forbidden - No permission",
+    "404": "Not Found - Resource not found",
+    "409": "Conflict - Duplicate/FK constraint",
+    "422": "Unprocessable Entity - Validation error",
+    "500": "Server Error"
+  },
+  "notes": {
+    "authentication": "All endpoints except /health, /auth/register, /auth/login require Bearer token in Authorization header",
+    "refresh_token": "Automatically stored as httpOnly cookie after login - used by /auth/refresh",
+    "data_ownership": "Users can only access their own data - cross-owner access returns 404",
+    "cascading_updates": "Some operations trigger automatic updates (e.g., lease create sets unit to OCCUPIED)",
+    "soft_deletes": "Some resources support soft delete (check actual implementation)"
+  }
+}

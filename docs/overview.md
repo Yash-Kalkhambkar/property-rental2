@@ -21,7 +21,7 @@ venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 
 # Every time
-uvicorn app.main:app --reload --port 8000
+.\venv\Scripts\uvicorn.exe app.main:app --host 0.0.0.0 --port 8000 --reload
 # Runs at http://localhost:8000
 # API docs at http://localhost:8000/docs
 ```
