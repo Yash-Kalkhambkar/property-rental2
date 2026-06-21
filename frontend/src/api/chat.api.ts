@@ -1,8 +1,12 @@
 /**
  * Streams a chat response from the backend via SSE.
- * Uses a relative /api path so the Vite dev proxy handles it,
- * exactly the same way all other API calls work in this project.
+ *
+ * Uses API_BASE_URL (from VITE_API_BASE_URL env var) — the same base URL
+ * every other API call in this project uses. This ensures it works both
+ * locally (via Vite proxy) and in production (direct backend URL on Render).
  */
+
+import { API_BASE_URL } from '@/types/common'
 
 export interface ChatMessage {
   role: 'user' | 'assistant'
@@ -24,9 +28,9 @@ export async function streamChatMessage({
   onDone: () => void
   onError: (msg: string) => void
 }) {
-  // Relative path — goes through the Vite proxy (/api → http://127.0.0.1:8000)
-  // Owner → /api/v1/chat/owner    Tenant → /api/v1/chat/tenant
-  const endpoint = `/api/v1/chat/${portal}`
+  // API_BASE_URL = e.g. "https://rental-api.onrender.com/api/v1" in production
+  //                      "/api/v1" locally (proxied by Vite to 127.0.0.1:8000)
+  const endpoint = `${API_BASE_URL}/chat/${portal}`
   console.log(`[RentEase AI] POST ${endpoint}`)
 
   let response: Response
@@ -45,7 +49,6 @@ export async function streamChatMessage({
   }
 
   if (!response.ok) {
-    // Log full details to console so we can debug
     const body = await response.text().catch(() => '')
     console.error(`[RentEase AI] ${response.status} ${response.statusText}`, body)
     onError(`Server error ${response.status}. Please try again.`)
@@ -67,7 +70,7 @@ export async function streamChatMessage({
 
     buffer += decoder.decode(value, { stream: true })
     const lines = buffer.split('\n')
-    buffer = lines.pop() ?? ''  // keep incomplete line in buffer
+    buffer = lines.pop() ?? ''
 
     for (const line of lines) {
       if (!line.startsWith('data: ')) continue
