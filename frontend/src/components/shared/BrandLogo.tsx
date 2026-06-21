@@ -38,7 +38,11 @@ export function BrandLogo({
         <Buildings weight="duotone" size={sizes.icon} />
       </span>
       {showText && (
-        <span className={cn('font-semibold tracking-tight', sizes.text)}>RentEase</span>
+        <span className={cn(
+          'font-semibold tracking-tight',
+          sizes.text,
+          variant === 'tenant' ? 'text-tenant-text' : 'text-white',
+        )}>RentEase</span>
       )}
     </span>
   )

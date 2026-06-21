@@ -46,6 +46,11 @@ export const useTenantAuthStore = create<TenantAuthState>((set, get) => ({
   },
 
   logout: () => {
+    // Clear chat history for this tenant before wiping the session
+    const tenantId = get().tenant?.id
+    if (tenantId) {
+      sessionStorage.removeItem(`rentease-chat-tenant-${tenantId}`)
+    }
     sessionStorage.removeItem(STORAGE_KEY)
     set({ accessToken: null, tenant: null })
   },

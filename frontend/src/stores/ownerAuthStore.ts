@@ -46,6 +46,11 @@ export const useOwnerAuthStore = create<OwnerAuthState>((set, get) => ({
   },
 
   logout: () => {
+    // Clear chat history for this owner before wiping the session
+    const ownerId = get().owner?.id
+    if (ownerId) {
+      sessionStorage.removeItem(`rentease-chat-owner-${ownerId}`)
+    }
     sessionStorage.removeItem(STORAGE_KEY)
     set({ accessToken: null, owner: null })
   },

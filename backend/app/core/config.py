@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # ── Scheduler ─────────────────────────────────────────────────────────────
     INTERNAL_JOB_SECRET: str
 
+    # ── AI Chat ───────────────────────────────────────────────────────────────
+    GROQ_API_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

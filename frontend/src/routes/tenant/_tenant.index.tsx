@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { CalendarBlank, CreditCard, FileText, User } from '@phosphor-icons/react'
+import { CalendarBlank, CreditCard, FileText, User, Sparkle } from '@phosphor-icons/react'
 import { PageShell } from '@/components/shared/PageShell'
 import { QuickActions } from '@/components/shared/QuickActions'
 import { StatRibbon } from '@/components/shared/StatRibbon'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { PageTransition, FadeInItem, Skeleton } from '@/components/shared/motion'
+import { TenantDashboardCharts } from '@/components/tenant/DashboardCharts'
 import { useTenantDashboard } from '@/hooks/tenant/usePortal'
 import { formatCurrency, formatDateShort } from '@/lib/formatters'
 
@@ -138,7 +139,87 @@ function TenantDashboardPage() {
             )}
           </div>
         </FadeInItem>
+
+        {/* Charts */}
+        <FadeInItem>
+          <TenantDashboardCharts data={data} />
+        </FadeInItem>
+
+        {/* Renter tips */}
+        <FadeInItem className="mt-8">
+          <TenantTips />
+        </FadeInItem>
+
       </PageShell>
     </PageTransition>
+  )
+}
+
+const TENANT_TIPS = [
+  {
+    emoji: '📸',
+    title: 'Document on move-in day',
+    tip: 'Take time-stamped photos of every room before unpacking. It\'s your best protection when the time comes to get your deposit back.',
+  },
+  {
+    emoji: '✉️',
+    title: 'Report issues in writing',
+    tip: 'Always report maintenance problems via message or email — never just verbally. A paper trail protects you if repairs go unaddressed.',
+  },
+  {
+    emoji: '📅',
+    title: 'Pay rent before the due date',
+    tip: 'Even 1 day early is better than on the day. Most online payment systems have cut-off times, and late fees add up fast over a year.',
+  },
+  {
+    emoji: '📄',
+    title: 'Read your lease carefully',
+    tip: 'Know your notice period, pet policy, and subletting rules before you need them. Surprises in lease agreements are rarely good surprises.',
+  },
+  {
+    emoji: '🔑',
+    title: 'Never share your access credentials',
+    tip: 'Your portal login is personal. If a family member needs access to payment records, ask your landlord to set up separate access.',
+  },
+  {
+    emoji: '💬',
+    title: 'Talk to your landlord early',
+    tip: 'If you\'re struggling with rent one month, reach out before the due date — not after. Most landlords would rather work something out than start eviction proceedings.',
+  },
+]
+
+function TenantTips() {
+  return (
+    <div className="glass-tenant rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-tenant-border">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-tenant-accent/15 text-tenant-accent">
+          <Sparkle weight="duotone" size={18} />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold text-tenant-text">Renter Tips</h3>
+          <p className="text-xs text-tenant-muted">Make the most of your tenancy</p>
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 divide-y divide-tenant-border sm:divide-y-0 sm:[&>*:nth-child(n+3)]:border-t sm:[&>*:nth-child(n+3)]:border-tenant-border lg:[&>*:nth-child(n+4)]:border-t lg:[&>*:nth-child(n+4)]:border-tenant-border">
+        {TENANT_TIPS.map((tip, i) => (
+          <motion.div
+            key={tip.title}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06 }}
+            className={[
+              'p-5 hover:bg-tenant-accent/5 transition-colors',
+              // right border between columns
+              'sm:[&:not(:nth-child(2n))]:border-r sm:border-tenant-border',
+              'lg:[&:not(:nth-child(3n))]:border-r lg:border-tenant-border',
+            ].join(' ')}
+          >
+            <p className="text-2xl mb-2">{tip.emoji}</p>
+            <p className="text-sm font-semibold text-tenant-text mb-1">{tip.title}</p>
+            <p className="text-xs text-tenant-muted leading-relaxed">{tip.tip}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   )
 }

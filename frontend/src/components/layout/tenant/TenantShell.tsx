@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/react'
 import { AppBackground } from '@/components/shared/AppBackground'
 import { BrandLogo } from '@/components/shared/BrandLogo'
+import { AiChat } from '@/components/shared/AiChat'
 import { Button } from '@/components/ui/button'
 import { useTenantAuthStore } from '@/stores/tenantAuthStore'
 import { useTenantLogout } from '@/hooks/tenant/useAuth'
@@ -25,6 +26,7 @@ const navItems = [
 
 export function TenantShell({ children }: { children: React.ReactNode }) {
   const tenant = useTenantAuthStore((s) => s.tenant)
+  const accessToken = useTenantAuthStore((s) => s.accessToken)
   const logout = useTenantLogout()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
@@ -119,6 +121,9 @@ export function TenantShell({ children }: { children: React.ReactNode }) {
         <span className="text-sm text-tenant-muted">{tenant?.full_name?.split(' ')[0]}</span>
       </div>
       <div className="md:hidden h-14" />
+
+      {/* AI Chat — positioned above bottom nav on mobile */}
+      <AiChat portal="tenant" token={accessToken} userId={tenant?.id ?? null} />
     </div>
   )
 }

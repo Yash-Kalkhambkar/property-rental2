@@ -17,12 +17,14 @@ export function AuthLayout({
   title,
   subtitle,
   footer,
+  sidebarExtra,
 }: {
   children: React.ReactNode
   variant?: 'owner' | 'tenant'
   title: string
   subtitle: string
   footer?: React.ReactNode
+  sidebarExtra?: React.ReactNode
 }) {
   const isOwner = variant === 'owner'
 
@@ -92,6 +94,12 @@ export function AuthLayout({
             ))}
           </ul>
         </div>
+
+        {sidebarExtra && (
+          <div className="max-w-md">
+            {sidebarExtra}
+          </div>
+        )}
 
         <p className={cn('text-xs', isOwner ? 'text-owner-muted/70' : 'text-tenant-muted')}>
           © {new Date().getFullYear()} RentEase
