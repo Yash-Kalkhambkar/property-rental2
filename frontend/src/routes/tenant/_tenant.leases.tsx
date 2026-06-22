@@ -55,12 +55,19 @@ function TenantLeasesPage() {
                       {lease.property_name}
                     </h3>
                     <p className="text-sm text-tenant-muted mt-1">{lease.property_address}</p>
-                    <div className="flex flex-wrap gap-6 mt-4 text-sm">
+                    <div className="flex flex-wrap gap-6 mt-4 text-sm text-tenant-muted">
                       <span>
-                        Unit <strong>{lease.unit_number}</strong> · {unitTypeLabel[lease.unit_type] ?? lease.unit_type}
+                        Unit <strong className="text-tenant-text font-semibold">{lease.unit_number}</strong>
+                        {' · '}{unitTypeLabel[lease.unit_type] ?? lease.unit_type}
                       </span>
                       <span className="text-tenant-accent font-semibold">
                         {formatCurrency(lease.monthly_rent)}/mo
+                      </span>
+                      <span>
+                        Deposit <strong className="text-tenant-text font-semibold">{formatCurrency(lease.deposit_paid)}</strong>
+                      </span>
+                      <span>
+                        Due day <strong className="text-tenant-text font-semibold">{lease.rent_due_day}</strong>
                       </span>
                     </div>
                   </div>

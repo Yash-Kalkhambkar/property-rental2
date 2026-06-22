@@ -61,7 +61,7 @@ function TenantPropertiesPage() {
                           key={unit.unit_number}
                           className="flex items-center justify-between rounded-xl bg-tenant-accent/5 px-4 py-3"
                         >
-                          <span className="font-medium">Unit {unit.unit_number}</span>
+                          <span className="font-medium text-tenant-text">Unit {unit.unit_number}</span>
                           <span className="text-sm text-tenant-muted">
                             {unitTypeLabel[unit.unit_type] ?? unit.unit_type}
                           </span>

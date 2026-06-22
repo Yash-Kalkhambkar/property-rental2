@@ -122,6 +122,25 @@ def create_lease(
 
     db.commit()
     db.refresh(lease)
+
+    # Send lease confirmation email to tenant
+    try:
+        from app.services.email_service import email_service
+        from app.core.config import settings
+        prop_for_email = db.query(Property).filter(Property.id == unit.property_id).first()
+        email_service.send_lease_confirmation(
+            to_email=tenant.email,
+            tenant_name=tenant.full_name,
+            property_name=prop_for_email.name if prop_for_email else "",
+            unit_number=unit.unit_number,
+            start_date=payload.start_date,
+            end_date=payload.end_date,
+            monthly_rent=float(payload.monthly_rent),
+            portal_url=f"{settings.FRONTEND_URL}/tenant/leases",
+        )
+    except Exception:
+        pass  # Don't fail lease creation if email fails
+
     return _lease_to_response(db, lease)
 
 

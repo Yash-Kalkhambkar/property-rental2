@@ -29,3 +29,7 @@ services:
         generateValue: true
       - key: GROQ_API_KEY
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_SENDER
+        sync: false

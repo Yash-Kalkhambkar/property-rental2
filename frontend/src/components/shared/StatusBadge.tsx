@@ -5,7 +5,7 @@ type StatusType = 'lease' | 'payment' | 'unit'
 
 const styles: Record<string, string> = {
   ACTIVE: 'border-l-success bg-success/10 text-success',
-  EXPIRED: 'border-l-owner-muted bg-owner-muted/10 text-owner-muted',
+  EXPIRED: 'border-l-[#78716c] bg-[#78716c]/10 text-[#78716c]',
   TERMINATED: 'border-l-danger bg-danger/10 text-danger',
   PENDING: 'border-l-warning bg-warning/10 text-warning',
   PAID: 'border-l-success bg-success/10 text-success',
@@ -35,7 +35,7 @@ export function StatusBadge({
     <span
       className={cn(
         'inline-flex items-center rounded-lg border-l-[3px] px-2.5 py-1 text-xs font-medium uppercase tracking-wide',
-        styles[status] ?? 'border-l-owner-muted bg-owner-elevated text-owner-muted',
+        styles[status] ?? 'border-l-[#78716c] bg-[#78716c]/10 text-[#78716c]',
         className,
       )}
     >

@@ -163,4 +163,16 @@ def owner_reset_tenant_password(
     tenant.password_hash = hash_password(temp_password)
     db.commit()
 
+    # Email the new temp password to the tenant
+    try:
+        from app.services.email_service import email_service
+        email_service.send_password_reset(
+            to_email=tenant.email,
+            tenant_name=tenant.full_name,
+            temp_password=temp_password,
+            portal_url=f"{settings.FRONTEND_URL}/tenant/login",
+        )
+    except Exception:
+        pass  # Don't fail the reset if email fails
+
     return temp_password

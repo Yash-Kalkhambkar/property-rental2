@@ -103,6 +103,30 @@ def create_payment(
     db.add(payment)
     db.commit()
     db.refresh(payment)
+
+    # Send receipt if fully or partially paid
+    if payment.status in ("PAID", "PARTIAL"):
+        try:
+            from app.services.email_service import email_service
+            from app.core.config import settings
+            from app.models.tenant import Tenant as TenantModel
+            from app.models.unit import Unit as UnitModel
+            tenant_obj = db.query(TenantModel).filter(TenantModel.id == lease.tenant_id).first()
+            unit_obj = db.query(UnitModel).filter(UnitModel.id == lease.unit_id).first()
+            if tenant_obj and unit_obj:
+                email_service.send_payment_receipt(
+                    to_email=tenant_obj.email,
+                    tenant_name=tenant_obj.full_name,
+                    amount_paid=float(payment.amount_paid),
+                    amount_due=float(payment.amount_due),
+                    unit=f"Unit {unit_obj.unit_number}",
+                    paid_date=payment.paid_date.isoformat() if payment.paid_date else "",
+                    payment_method=payment.payment_method,
+                    portal_url=f"{settings.FRONTEND_URL}/tenant/payments",
+                )
+        except Exception:
+            pass
+
     return _payment_to_response(payment)
 
 

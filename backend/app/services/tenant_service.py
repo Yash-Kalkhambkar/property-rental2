@@ -12,6 +12,8 @@ from app.schemas.tenant import (
 )
 from app.services.storage_service import storage_service
 from app.core.security import hash_password
+from app.core.config import settings
+from app.services.email_service import email_service
 
 
 def list_tenants(
@@ -74,6 +76,18 @@ def create_tenant(
     db.add(tenant)
     db.commit()
     db.refresh(tenant)
+
+    # Send welcome email with login credentials
+    try:
+        email_service.send_tenant_welcome(
+            to_email=tenant.email,
+            tenant_name=tenant.full_name,
+            password=payload.password,
+            portal_url=f"{settings.FRONTEND_URL}/tenant/login",
+        )
+    except Exception:
+        pass  # Don't fail tenant creation if email fails
+
     return _tenant_to_response(tenant)
 
 
