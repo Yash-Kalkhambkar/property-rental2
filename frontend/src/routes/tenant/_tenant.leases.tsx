@@ -37,7 +37,7 @@ function TenantLeasesPage() {
           />
         ) : (
           <div className="space-y-4">
-            {leases.map((lease, i) => (
+            {leases.map((lease) => (
               <FadeInItem key={lease.id}>
                 <motion.div
                   whileHover={{ y: -2 }}

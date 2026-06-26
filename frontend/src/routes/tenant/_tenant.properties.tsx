@@ -36,7 +36,7 @@ function TenantPropertiesPage() {
           />
         ) : (
           <div className="grid gap-5 sm:grid-cols-2">
-            {properties.map((property, i) => (
+            {properties.map((property) => (
               <FadeInItem key={property.id}>
                 <motion.div
                   whileHover={{ y: -4 }}

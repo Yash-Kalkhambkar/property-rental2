@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { Link } from '@tanstack/react-router'
 import { CheckCircle } from '@phosphor-icons/react'
 import { AppBackground } from '@/components/shared/AppBackground'
 import { BrandLogo } from '@/components/shared/BrandLogo'

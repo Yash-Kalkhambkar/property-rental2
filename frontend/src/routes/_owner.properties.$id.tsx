@@ -9,7 +9,6 @@ import {
   Trash,
   Door,
 } from '@phosphor-icons/react'
-import { PageShell } from '@/components/shared/PageShell'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { Skeleton } from '@/components/shared/motion'
 import { Button } from '@/components/ui/button'

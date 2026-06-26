@@ -109,12 +109,14 @@ export function TenantFormDialog({
   )
 }
 
+type BaseFormFields = Omit<CreateForm, 'password'>
+
 function TenantFields({
   register,
   errors,
 }: {
-  register: ReturnType<typeof useForm<CreateForm>>['register']
-  errors: ReturnType<typeof useForm<CreateForm>>['formState']['errors']
+  register: ReturnType<typeof useForm<BaseFormFields>>['register']
+  errors: ReturnType<typeof useForm<BaseFormFields>>['formState']['errors']
 }) {
   return (
     <>

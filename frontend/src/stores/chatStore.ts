@@ -65,8 +65,8 @@ function clearStoredMessages(portal: 'owner' | 'tenant', userId: string) {
 
 // ── Store factory ─────────────────────────────────────────────────────────────
 
-function createChatStore(portal: 'owner' | 'tenant') {
-  return create<ChatState>((set, get) => ({
+function createChatStore(_portal: 'owner' | 'tenant') {
+  return create<ChatState>((set, _get) => ({
     isOpen: false,
     messages: [],   // hydrated lazily in AiChat when userId is known
     isStreaming: false,

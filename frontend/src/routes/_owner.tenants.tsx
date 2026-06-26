@@ -83,7 +83,7 @@ function TenantsPage() {
         ) : (
           <>
             <div className="space-y-3">
-              {data.items.map((tenant, i) => (
+              {data.items.map((tenant) => (
                 <FadeInItem key={tenant.id}>
                   <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
                     <Link

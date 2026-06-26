@@ -8,8 +8,8 @@ import {
   Phone,
   EnvelopeSimple,
   User,
+  type Icon as PhosphorIcon,
 } from '@phosphor-icons/react'
-import { PageShell } from '@/components/shared/PageShell'
 import { DocumentUploadBlock } from '@/components/shared/DocumentUploadBlock'
 import { Skeleton } from '@/components/shared/motion'
 import { Button } from '@/components/ui/button'
@@ -192,7 +192,7 @@ function InfoBlock({
   label,
   value,
 }: {
-  icon?: React.ComponentType<{ className?: string }>
+  icon?: PhosphorIcon
   label: string
   value: string
 }) {

@@ -64,7 +64,7 @@ function PropertiesPage() {
         ) : (
           <>
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {data.items.map((property, i) => (
+              {data.items.map((property) => (
                 <FadeInItem key={property.id}>
                   <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.25 }}>
                     <Link

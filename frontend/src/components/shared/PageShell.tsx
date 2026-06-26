@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import type { Icon } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 export function PageShell({

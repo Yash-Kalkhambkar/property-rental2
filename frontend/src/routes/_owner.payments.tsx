@@ -102,7 +102,7 @@ function PaymentsPage() {
         ) : (
           <>
             <div className="space-y-2">
-              {data.items.map((payment, i) => (
+              {data.items.map((payment) => (
                 <FadeInItem key={payment.id}>
                   <motion.div
                     initial={{ opacity: 0 }}
