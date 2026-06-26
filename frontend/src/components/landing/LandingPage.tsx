@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, useInView, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import {
@@ -137,68 +137,44 @@ function PortalCard({ variant, title, description, href, icon: Icon }:
   )
 }
 
-// ── Animated dashboard widget ─────────────────────────────────────────────────
+// ── Feature preview card ───────────────────────────────────────────────────────
 
 function DashboardWidget() {
-  const [counts, setCounts] = useState({ occ: 0, col: 0, leases: 0, overdue: 0 })
   const ref = useRef(null)
   const inView = useInView(ref, { once: true })
 
-  useEffect(() => {
-    if (!inView) return
-    const targets = { occ: 94, col: 124, leases: 128, overdue: 3 }
-    const dur = 1400
-    const start = performance.now()
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / dur, 1)
-      const ease = 1 - Math.pow(1 - p, 3)
-      setCounts({
-        occ: Math.round(targets.occ * ease),
-        col: Math.round(targets.col * ease),
-        leases: Math.round(targets.leases * ease),
-        overdue: Math.round(targets.overdue * ease),
-      })
-      if (p < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
-  }, [inView])
-
-  const bars = [65, 80, 55, 90, 72, 88, 94]
+  const highlights = [
+    { icon: ChartLineUp, label: 'Occupancy at a glance', sub: 'See which units are vacant right now' },
+    { icon: CreditCard,  label: 'Rent collection',       sub: 'Track paid, pending, and overdue' },
+    { icon: UsersThree,  label: 'Tenant profiles',        sub: 'Contacts, leases, and ID docs in one place' },
+    { icon: ShieldCheck, label: 'Resident portal',        sub: 'Tenants see only their own data' },
+  ]
 
   return (
     <TiltCard className="group">
       <div ref={ref} className="landing-glass relative rounded-2xl p-6 overflow-hidden">
-        {/* Inner glow pulse */}
         <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-[#3b82f6]/20 blur-2xl animate-pulse" />
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">Live portfolio</p>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {[
-            { label: 'Occupancy', value: `${counts.occ}%`, accent: true },
-            { label: 'Collected', value: `₹${counts.col}L`, normal: true },
-            { label: 'Active leases', value: `${counts.leases}`, normal: true },
-            { label: 'Overdue', value: `${counts.overdue}`, warn: true },
-          ].map(m => (
-            <div key={m.label} className="rounded-xl border border-white/[0.1] bg-white/[0.06] p-3.5 transition-colors hover:bg-white/[0.1]">
-              <p className="text-[10px] uppercase tracking-wider text-slate-300">{m.label}</p>
-              <p className={cn('mt-1 text-2xl font-bold tabular-nums',
-                m.accent && 'text-gradient-owner', m.warn && 'text-[#fbbf24]', m.normal && 'text-white')}>
-                {m.value}
-              </p>
-            </div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300 mb-5">
+          Everything in one place
+        </p>
+        <div className="space-y-3">
+          {highlights.map(({ icon: Icon, label, sub }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, x: 16 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-3.5 rounded-xl border border-white/[0.08] bg-white/[0.05] px-4 py-3 hover:bg-white/[0.09] transition-colors"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#3b82f6]/15 text-[#93c5fd]">
+                <Icon weight="duotone" size={16} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white leading-tight">{label}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>
+              </div>
+            </motion.div>
           ))}
-        </div>
-        {/* Mini bar chart */}
-        <div className="mt-5 pt-4 border-t border-white/[0.05]">
-          <p className="text-[10px] uppercase tracking-wider text-slate-300 mb-3">Collection trend</p>
-          <div className="flex items-end gap-1.5 h-12">
-            {bars.map((h, i) => (
-              <motion.div key={i} className="flex-1 rounded-t-sm bg-gradient-to-t from-[#3b82f6]/60 to-[#6366f1]/80"
-                initial={{ height: 0 }} animate={inView ? { height: `${h}%` } : { height: 0 }}
-                transition={{ delay: 0.8 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                style={{ maxHeight: '100%' }}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </TiltCard>
