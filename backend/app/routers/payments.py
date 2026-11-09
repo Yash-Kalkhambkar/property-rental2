@@ -15,6 +15,7 @@ def list_payments(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     status: str | None = None,
+    
     lease_id: str | None = None,
     month: str | None = None,
     db: Session = Depends(get_db),
