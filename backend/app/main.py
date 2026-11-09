@@ -19,6 +19,7 @@ from app.routers import (
     tenant_auth,
     tenant_data,
     chat,
+    admin,
 )
 from app.tasks.scheduler import start_scheduler
 
@@ -89,6 +90,11 @@ def create_app() -> FastAPI:
         chat.router,
         prefix=f"{prefix}/chat",
         tags=["AI Chat"],
+    )
+    app.include_router(
+        admin.router,
+        prefix=f"{prefix}/admin",
+        tags=["Admin"],
     )
 
     @app.get("/health")
